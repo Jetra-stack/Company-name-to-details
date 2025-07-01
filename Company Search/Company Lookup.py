@@ -6,7 +6,7 @@ import requests
 import requests
 import streamlit as st
 
-SERPER_API_KEY = st.secrets["SERPER_API_KEY"]
+SERPER_API_KEY = "18de03250651e4da793a78266cec557f6451196a"
 
 def get_company_info_from_serper(company_name):
     url = "https://google.serper.dev/search"
