@@ -5,6 +5,8 @@ import requests
 
 import requests
 import streamlit as st
+import pandas as pd
+
 
 SERPER_API_KEY = "18de03250651e4da793a78266cec557f6451196a"
 
@@ -23,30 +25,47 @@ def get_company_info_from_serper(company_name):
 
     if "organic" in data and data["organic"]:
         top_result = data["organic"][0]
-        title = top_result.get("title")
-        link = top_result.get("link")
-        snippet = top_result.get("snippet")
-
         return {
-            "title": title,
-            "website": link,
-            "summary": snippet
+            "Company": company_name,
+            "Title": top_result.get("title", "N/A"),
+            "Website": top_result.get("link", "N/A"),
+            "Summary": top_result.get("snippet", "N/A")
         }
     else:
-        return {"error": "No results found."}
+        return {
+            "Company": company_name,
+            "Title": "N/A",
+            "Website": "N/A",
+            "Summary": "No results found."
+        }
 
-#Streamlit UI
-st.title("🔍 Company Info Finder (via Serper)")
-company_name = st.text_input("Enter a company name:")
+# Streamlit UI
+st.title("🔍 Company Info Finder (via Serper API)")
 
-if st.button("Search") and company_name.strip():
-    with st.spinner("Fetching company info..."):
-        info = get_company_info_from_serper(company_name)
+company_input = st.text_area(
+    "Enter company names (one per line):",
+    placeholder="Apple\nMicrosoft\nTesla"
+)
+
+if st.button("Search") and company_input.strip():
+    company_list = [name.strip() for name in company_input.split("\n") if name.strip()]
     
-    st.markdown("### 📄 Result:")
-    if "error" in info:
-        st.error(info["error"])
-    else:
-        st.markdown(f"**Title:** {info['title']}")
-        st.markdown(f"**Website:** [{info['website']}]({info['website']})")
-        st.markdown(f"**Summary:** {info['summary']}")
+    results = []
+    with st.spinner("Fetching info for all companies..."):
+        for name in company_list:
+            result = get_company_info_from_serper(name)
+            results.append(result)
+
+    if results:
+        df = pd.DataFrame(results)
+        st.markdown("### 📄 Company Info Table")
+        st.dataframe(df, use_container_width=True)
+
+        # Show download button only if results exist
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Export as CSV",
+            data=csv,
+            file_name="company_info.csv",
+            mime="text/csv"
+        )
