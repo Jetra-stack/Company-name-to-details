@@ -27,6 +27,21 @@ INDUSTRY_KEYWORDS: List[Tuple[str, List[str]]] = [
         ],
     ),
     (
+        "Manufacturing & Supply Chain",
+        [
+            "manufacturing",
+            "manufacturer",
+            "factory",
+            "fabrication",
+            "production facility",
+            "supply chain",
+            "contract manufacturer",
+            "industrial automation",
+            "assembly plant",
+            "supply solutions",
+        ],
+    ),
+    (
         "IT Services & Consulting",
         [
             "it services",
@@ -116,21 +131,6 @@ INDUSTRY_KEYWORDS: List[Tuple[str, List[str]]] = [
             "supermarket",
             "department store",
             "omnichannel",
-        ],
-    ),
-    (
-        "Manufacturing & Supply Chain",
-        [
-            "manufacturing",
-            "manufacturer",
-            "factory",
-            "fabrication",
-            "production facility",
-            "supply chain",
-            "contract manufacturer",
-            "industrial automation",
-            "assembly plant",
-            "supply solutions",
         ],
     ),
     (
