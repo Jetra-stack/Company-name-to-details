@@ -374,6 +374,7 @@ def _classify_business_type(text: str) -> str:
 
 
 
+
 def get_company_info_from_serper(company_name: str) -> dict:
     url = "https://google.serper.dev/search"
     headers = {
