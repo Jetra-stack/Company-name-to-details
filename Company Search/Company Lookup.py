@@ -327,7 +327,7 @@ STARTUP_KEYWORDS: List[str] = [
     "funding"
 ]
 
-TRADITIONAL_KEYWORDS: List[str] = [
+TRADITIONAL/PUBLIC_KEYWORDS: List[str] = [
     "established",
     "since 19",
     "since 18",
@@ -337,13 +337,14 @@ TRADITIONAL_KEYWORDS: List[str] = [
     "incumbent",
     "multinational",
     "family business"
-]
-
-PUBLIC_KEYWORDS: List[str] = [
     "public company",
     "publicly traded",
     "listed company",
     "fortune 500"
+]
+
+PUBLIC_KEYWORDS: List[str] = [
+    
 ]
 
 
@@ -370,14 +371,9 @@ def _classify_business_type(text: str) -> str:
     if any(keyword in lower_text for keyword in STARTUP_KEYWORDS):
         return "Startup"
 
-    if any(keyword in lower_text for keyword in TRADITIONAL_KEYWORDS):
-        return "Traditional"
+    if any(keyword in lower_text for keyword in TRADITIONAL/PUBLIC_KEYWORDS_KEYWORDS):
+        return "Traditional/Public Company"
     
-    if any(keyword in lower_text for keyword in PUBLIC_KEYWORDS):
-        return "Public Company"
-
-    return "Public Company"
-
 
 
 def get_company_info_from_serper(company_name: str) -> dict:
