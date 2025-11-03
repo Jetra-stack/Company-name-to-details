@@ -327,7 +327,7 @@ STARTUP_KEYWORDS: List[str] = [
     "funding"
 ]
 
-TRADITIONAL OR PUBLIC_KEYWORDS: List[str] = [
+TRADITIONAL_KEYWORDS: List[str] = [
     "established",
     "since 19",
     "since 18",
@@ -343,9 +343,6 @@ TRADITIONAL OR PUBLIC_KEYWORDS: List[str] = [
     "fortune 500"
 ]
 
-PUBLIC_KEYWORDS: List[str] = [
-    
-]
 
 
 def _standardize_industry_from_text(text: str) -> str:
@@ -371,7 +368,7 @@ def _classify_business_type(text: str) -> str:
     if any(keyword in lower_text for keyword in STARTUP_KEYWORDS):
         return "Startup"
 
-    if any(keyword in lower_text for keyword in TRADITIONAL OR PUBLIC_KEYWORDS_KEYWORDS):
+    if any(keyword in lower_text for keyword in TRADITIONAL_KEYWORDS_KEYWORDS):
         return "Traditional or Public Company"
     
 
@@ -462,4 +459,5 @@ if st.button("Search") and company_input.strip():
         )
 else:
     st.info("Add one or more company names to start a lookup.")
+
 
