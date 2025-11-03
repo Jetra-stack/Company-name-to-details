@@ -372,8 +372,6 @@ def _classify_business_type(text: str) -> str:
     if any(keyword in lower_text for keyword in TRADITIONAL_KEYWORDS):
         return "Traditional or Public Company"
 
-    return "Unknown"
-
 
 def get_company_info_from_serper(company_name: str) -> dict:
     url = "https://google.serper.dev/search"
@@ -461,3 +459,4 @@ if st.button("Search") and company_input.strip():
         )
 else:
     st.info("Add one or more company names to start a lookup.")
+
