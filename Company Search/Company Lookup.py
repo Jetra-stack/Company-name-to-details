@@ -304,6 +304,220 @@ INDUSTRY_KEYWORDS: List[Tuple[str, List[str]]] = [
     ),
 ]
 
+PUBLIC_KEYWORDS: List[str] = [
+    "public company",
+    "publicly traded",
+    "listed company",
+    "fortune 500",
+]
+
+STARTUP_KEYWORDS: List[str] = [
+    "startup",
+    "scale-up",
+    "scaleup",
+    "seed round",
+    "series a",
+    "series b",
+    "series c",
+    "pre-seed",
+    "vc-backed",
+    "venture-backed",
+    "venture capital",
+    "accelerator",
+    "incubator",
+    "y combinator",
+    "yc",
+    "angel investment",
+    "early-stage",
+    "fast-growing",
+    "high-growth",
+    "growth stage",
+    "funding",
+]
+
+TRADITIONAL_KEYWORDS: List[str] = [
+    "established",
+    "since 19",
+    "since 18",
+    "legacy",
+    "subsidiary",
+    "conglomerate",
+    "incumbent",
+    "multinational",
+    "family business",
+    "public company",
+    "publicly traded",
+    "listed company",
+    "fortune 500",
+]
+
+# Sub-industry heuristics grouped by parent industry so we can surface a meaningful niche.
+SUB_INDUSTRY_KEYWORDS: List[Tuple[str, str, List[str]]] = [
+    (
+        "Insurtech",
+        "Financial Services",
+        [
+            "insurtech",
+            "insuretech",
+            "digital insurance",
+            "insurance technology",
+            "online insurance",
+        ],
+    ),
+    (
+        "Payments",
+        "Financial Services",
+        [
+            "payment platform",
+            "payment gateway",
+            "payment processing",
+            "merchant acquiring",
+            "pos terminal",
+            "upi",
+            "remittance",
+            "remittances",
+            "digital wallet",
+            "wallet app",
+            "payment aggregator",
+        ],
+    ),
+    (
+        "Lending Tech",
+        "Financial Services",
+        [
+            "digital lending",
+            "lending platform",
+            "loan app",
+            "loan marketplace",
+            "bnpl",
+            "buy now pay later",
+            "p2p lending",
+            "micro lending",
+            "micro-lending",
+            "credit scoring platform",
+            "invoice financing",
+            "sme lending",
+            "working capital platform",
+        ],
+    ),
+    (
+        "WealthTech",
+        "Financial Services",
+        [
+            "wealthtech",
+            "wealth management platform",
+            "robo advisor",
+            "robo-advisor",
+            "robo advisory",
+            "investment app",
+            "trading app",
+            "brokerage app",
+            "stock trading app",
+            "portfolio management software",
+        ],
+    ),
+    (
+        "Digital Banking",
+        "Financial Services",
+        [
+            "neobank",
+            "neo bank",
+            "neobanking",
+            "digital bank",
+            "challenger bank",
+        ],
+    ),
+    (
+        "Crypto & Blockchain",
+        "Financial Services",
+        [
+            "crypto",
+            "cryptocurrency",
+            "digital asset",
+            "digital assets",
+            "blockchain",
+            "defi",
+            "web3",
+            "tokenization",
+            "nft",
+            "stablecoin",
+        ],
+    ),
+    (
+        "Proptech",
+        "Real Estate",
+        [
+            "proptech",
+            "property technology",
+            "real estate tech",
+            "property management software",
+            "real estate platform",
+        ],
+    ),
+    (
+        "Agtech",
+        "Agriculture",
+        [
+            "agtech",
+            "agri-tech",
+            "precision agriculture",
+            "precision farming",
+            "farm management software",
+            "digital farming",
+        ],
+    ),
+    (
+        "Edtech",
+        "Education",
+        [
+            "edtech",
+            "learning platform",
+            "online learning",
+            "digital classroom",
+            "mooc",
+            "learning management system",
+            "lms",
+        ],
+    ),
+    (
+        "Telehealth",
+        "Healthcare",
+        [
+            "telehealth",
+            "telemedicine",
+            "virtual care",
+            "remote care",
+            "digital health",
+            "digital therapeutics",
+        ],
+    ),
+    (
+        "Medtech",
+        "Healthcare",
+        [
+            "medtech",
+            "medical device",
+            "medical devices",
+            "diagnostic device",
+            "diagnostics device",
+            "surgical device",
+            "med-tech",
+        ],
+    ),
+    (
+        "Biotech",
+        "Healthcare",
+        [
+            "biotech",
+            "biotechnology",
+            "gene therapy",
+            "cell therapy",
+            "biopharma",
+            "drug discovery platform",
+        ],
+    ),
+]
+
 STARTUP_KEYWORDS: List[str] = [
     "startup",
     "scale-up",
@@ -346,15 +560,37 @@ TRADITIONAL_KEYWORDS: List[str] = [
 
 
 
-def _standardize_industry_from_text(text: str) -> str:
-    """Return a standardized industry based on keywords in the text."""
+def _standardize_industry_from_text(text: str) -> Tuple[str, str]:
+    """Return a standardized industry and the matching keyword based on the text."""
+    if not text:
+        return "Unknown", "Unknown"
+
+    lower_text = text.lower()
+    for industry, keywords in INDUSTRY_KEYWORDS:
+        for keyword in keywords:
+            if keyword in lower_text:
+                return industry, keyword.strip()
+
+    return "Unknown", "Unknown"
+
+
+def _detect_sub_industry(text: str, industry: str) -> str:
+    """Return a sub-industry label based on keywords, prioritizing matches within the detected industry."""
     if not text:
         return "Unknown"
 
     lower_text = text.lower()
-    for industry, keywords in INDUSTRY_KEYWORDS:
+
+    if industry and industry != "Unknown":
+        for sub_industry, parent_industry, keywords in SUB_INDUSTRY_KEYWORDS:
+            if parent_industry != industry:
+                continue
+            if any(keyword in lower_text for keyword in keywords):
+                return sub_industry
+
+    for sub_industry, _parent_industry, keywords in SUB_INDUSTRY_KEYWORDS:
         if any(keyword in lower_text for keyword in keywords):
-            return industry
+            return sub_industry
 
     return "Unknown"
 
@@ -372,7 +608,10 @@ def _classify_business_type(text: str) -> str:
     if any(keyword in lower_text for keyword in TRADITIONAL_KEYWORDS):
         return "Traditional or Public Company"
 
+    if any(keyword in lower_text for keyword in PUBLIC_KEYWORDS):
+        return "Traditional or Public Company"
 
+    return "Unknown"
 
 
 def get_company_info_from_serper(company_name: str) -> dict:
@@ -394,6 +633,8 @@ def get_company_info_from_serper(company_name: str) -> dict:
             "Website": "N/A",
             "Summary": "Lookup failed.",
             "Industry": "Unknown",
+            "Sub Industry": "Unknown",
+            "Industry Keyword": "Unknown",
             "Business Type": "Unknown",
         }
 
@@ -405,7 +646,8 @@ def get_company_info_from_serper(company_name: str) -> dict:
         combined_text = " ".join(
             part for part in (title, snippet) if part and part != "N/A"
         )
-        industry = _standardize_industry_from_text(combined_text)
+        industry, industry_keyword = _standardize_industry_from_text(combined_text)
+        sub_industry = _detect_sub_industry(combined_text, industry)
         business_type = _classify_business_type(combined_text)
         return {
             "Company": company_name,
@@ -413,6 +655,8 @@ def get_company_info_from_serper(company_name: str) -> dict:
             "Website": link,
             "Summary": snippet,
             "Industry": industry,
+            "Sub Industry": sub_industry,
+            "Industry Keyword": industry_keyword,
             "Business Type": business_type,
         }
 
@@ -422,6 +666,8 @@ def get_company_info_from_serper(company_name: str) -> dict:
         "Website": "N/A",
         "Summary": "No results found.",
         "Industry": "Unknown",
+        "Sub Industry": "Unknown",
+        "Industry Keyword": "Unknown",
         "Business Type": "Unknown",
     }
 
@@ -445,9 +691,24 @@ if st.button("Search") and company_input.strip():
         df = pd.DataFrame(results)
         if "Industry" not in df.columns:
             df["Industry"] = "Unknown"
+        if "Sub Industry" not in df.columns:
+            df["Sub Industry"] = "Unknown"
+        if "Industry Keyword" not in df.columns:
+            df["Industry Keyword"] = "Unknown"
         if "Business Type" not in df.columns:
             df["Business Type"] = "Unknown"
-        df = df[["Company", "Industry", "Business Type", "Title", "Website", "Summary"]]
+        df = df[
+            [
+                "Company",
+                "Industry",
+                "Sub Industry",
+                "Industry Keyword",
+                "Business Type",
+                "Title",
+                "Website",
+                "Summary",
+            ]
+        ]
 
         st.markdown("### Company Info Table")
         st.dataframe(df, use_container_width=True)
