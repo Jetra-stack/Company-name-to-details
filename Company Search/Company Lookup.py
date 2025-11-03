@@ -101,6 +101,7 @@ INDUSTRY_KEYWORDS: List[Tuple[str, List[str]]] = [
             "beauty brand",
             "beverage",
             "food brand",
+            "food",
         ],
     ),
     (
