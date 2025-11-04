@@ -3,7 +3,7 @@ import requests
 import streamlit as st
 from typing import List, Tuple
 
-SERPER_API_KEY = "18de03250651e4da793a78266cec557f6451196a"
+SERPER_API_KEY = "19348fc945f4a5a4f1983d595df7839f158bf2fb"
 
 INDUSTRY_KEYWORDS: List[Tuple[str, List[str]]] = [
     (
@@ -722,3 +722,4 @@ if st.button("Search") and company_input.strip():
         )
 else:
     st.info("Add one or more company names to start a lookup.")
+
