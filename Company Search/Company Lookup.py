@@ -3,7 +3,7 @@ import requests
 import streamlit as st
 from typing import List, Tuple
 
-SERPER_API_KEY = "19348fc945f4a5a4f1983d595df7839f158bf2fb"
+SERPER_API_KEY = 
 
 INDUSTRY_KEYWORDS: List[Tuple[str, List[str]]] = [
     (
